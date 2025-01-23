@@ -1,17 +1,30 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import dbConnect from "./Db/dbConnect.js";
 import authRoutes from "./Routes/authroute.js";
+
 dotenv.config();
-const app = express()
- const PORT = process.env.PORT ;
+
+const app = express();
+const PORT = process.env.PORT || 3000; // Defaulting to port 3000 if PORT is not defined in .env
+
+// Middleware
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors());
+
 // Routes
-app.use('/api/auth', authRoutes); 
- app.get("/",(req,res)=>{
-    res.send("hello world")
- })
- app.listen(PORT,()=>{
-      dbConnect();
-       console.log(`http://localhost:${PORT}`)
- })  
+app.use('/api/auth', authRoutes);
+
+
+
+app.get("/", (req, res) => {
+    res.send("Hello World");
+});
+
+app.listen(PORT, () => {
+    dbConnect();
+    console.log(`Server is running at http://localhost:${PORT}`);
+});
