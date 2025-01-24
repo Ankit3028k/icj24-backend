@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-
+// import 
 
 const newsSchema = new mongoose.Schema({
     title: {
@@ -28,7 +28,7 @@ const newsSchema = new mongoose.Schema({
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        required: true
+        required:true
     },
     
   
@@ -46,6 +46,6 @@ newsSchema.set('toJSON', {
     virtuals: true,
 });
 
-const news = mongoose.model('Category', newsSchema);
+const news = mongoose.model('News', newsSchema);
 
 export default news;
