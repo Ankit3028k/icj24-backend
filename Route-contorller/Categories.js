@@ -34,11 +34,10 @@ router.get('/:id', async (req, res) => {
 // POST a new category
 router.post('/', async (req, res) => {
     try {
-        const { name, img, color } = req.body;
+        const { name } = req.body;
         const category = new Category({
-            name,
-            img,
-            color
+            name
+            
         });
         const savedCategory = await category.save();
         res.status(201).send(savedCategory);

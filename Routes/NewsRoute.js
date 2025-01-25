@@ -7,3 +7,4 @@ router.delete('/news/:id', newsDelete);
 router.put('/news/gallery/:id', newsUpdateGallery);
 
 export default router;
+ 

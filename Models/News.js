@@ -46,6 +46,6 @@ newsSchema.set('toJSON', {
     virtuals: true,
 });
 
-const news = mongoose.model('Category', newsSchema);
+const news = mongoose.model('News', newsSchema);
 
 export default news;

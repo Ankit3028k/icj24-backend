@@ -5,7 +5,7 @@ import cors from "cors";
 import dbConnect from "./Db/dbConnect.js";
 import authRoutes from "./Routes/authroute.js";
 import newsRoutes from "./Route-contorller/NewsRouteController.js";
-
+import categoriesRoutes from "./Route-contorller/Categories.js";
 dotenv.config();
 
 const app = express();
@@ -19,7 +19,7 @@ app.use(cors());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
-
+app.use('/api/categories', categoriesRoutes);
 
 
 app.get("/", (req, res) => {
