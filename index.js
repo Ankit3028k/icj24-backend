@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dbConnect from "./Db/dbConnect.js";
 import authRoutes from "./Routes/authroute.js";
+import newsRoutes from "./Route-contorller/NewsRouteController.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/news', newsRoutes);
 
 
 

@@ -13,30 +13,32 @@ const storage = multer.memoryStorage();
 const uploadOptions = multer({ storage });
 
 // POST a new news with a single image upload
-router.post('/', uploadOptions.single('image'), async (req, res) => {
+router.post('/',
+    //  uploadOptions.single('image'),
+      async (req, res) => {
     try {
         const category = await Category.findById(req.body.category);
         if (!category) return res.status(400).send('Invalid Category');
 
-        const file = req.file;
-        if (!file) return res.status(400).send('No image in the request');
+        // const file = req.file;
+        // if (!file) return res.status(400).send('No image in the request');
 
-        // Upload image to Cloudinary
-        const result = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream((error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-            });
-            streamifier.createReadStream(file.buffer).pipe(uploadStream);
-        });
+        // // Upload image to Cloudinary
+        // const result = await new Promise((resolve, reject) => {
+        //     const uploadStream = cloudinary.uploader.upload_stream((error, result) => {
+        //         if (error) reject(error);
+        //         else resolve(result);
+        //     });
+        //     streamifier.createReadStream(file.buffer).pipe(uploadStream);
+        // });
 
-        const imageUrl = result.secure_url;
+        // const imageUrl = result.secure_url;
 
         const news = new News({
             title: req.body.title,
             content: req.body.content,
             richDescription: req.body.richDescription,
-            image: imageUrl,
+            // image: imageUrl,
             category: req.body.category,
             datePosted: req.body.datePosted
         });
