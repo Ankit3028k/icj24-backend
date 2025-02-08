@@ -9,7 +9,7 @@ const newsSchema = new mongoose.Schema({
     },
     content: {
         type: String,
-        required: true
+        // required: true
     },
     richDescription: {
         type: String,
@@ -22,13 +22,16 @@ const newsSchema = new mongoose.Schema({
     // images: [{
     //     type: String
     // }],
-   
+   author:[{
+         type: String,
+         default: ''
+   }],
    
    
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        required: true
+        required: true 
     },
     
   

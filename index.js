@@ -13,13 +13,14 @@ const PORT = process.env.PORT || 3000; // Defaulting to port 3000 if PORT is not
 
 // Middleware
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser()); 
 app.use(cors());
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/categories', categoriesRoutes);
+// app.use('/api/categories:id', categoriesRoutes);
 
 
 app.get("/", (req, res) => {
