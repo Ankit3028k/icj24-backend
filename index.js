@@ -19,7 +19,7 @@ app.use(cors());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
-app.use('/api/categories', categoriesRoutes);
+app.use('/api/categories', categoriesRoutes); 
 // app.use('/api/categories:id', categoriesRoutes);
 
 
