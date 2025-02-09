@@ -6,6 +6,8 @@ import dbConnect from "./Db/dbConnect.js";
 import authRoutes from "./Routes/authroute.js";
 import newsRoutes from "./Route-contorller/NewsRouteController.js";
 import categoriesRoutes from "./Route-contorller/Categories.js";
+import videoRoutes from "./Routes/FeaturedVideoRoute.js";
+
 dotenv.config();
 
 const app = express();
@@ -20,6 +22,7 @@ app.use(cors());
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/categories', categoriesRoutes); 
+app.use('/api/video',videoRoutes)
 // app.use('/api/categories:id', categoriesRoutes);
 
 
