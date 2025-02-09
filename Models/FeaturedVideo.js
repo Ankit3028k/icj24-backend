@@ -21,6 +21,6 @@ featuredVideoSchema.set('toJSON', {
     virtuals: true,
 });
 
-const videoNews = mongoose.model('News', featuredVideoSchema);
+const videoNews = mongoose.model('video', featuredVideoSchema);
 
 export default videoNews;
