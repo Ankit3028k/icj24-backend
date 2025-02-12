@@ -202,35 +202,31 @@ router.put('/gallery-images/:id', uploadOptions.array('images', 10), async (req,
     res.send(news);
 });
 
-// PATCH to update a news (e.g., mark as Featured)
 router.patch('/:id', async (req, res) => {
     const newsId = req.params.id;
-    const { isFeatured } = req.body;
-    
- 
-    if (typeof isFeatured !== 'boolean') {
-      return res.status(400).json({ message: 'isFeatured must be a boolean value.' });
+    const { isFeatured, isDrafted } = req.body;
+  
+    // Ensure both fields are boolean values
+    if (typeof isFeatured !== 'boolean' || typeof isDrafted !== 'boolean') {
+      return res.status(400).json({ message: 'Both isFeatured and isDrafted must be boolean values.' });
     }
- 
+  
     try {
       const updatedNews = await News.findByIdAndUpdate(
         newsId,
-        { isFeatured: isFeatured },
+        { isFeatured: isFeatured, isDrafted: isDrafted }, // Include isDrafted here as well
         { new: true }
       );
- 
+  
       if (!updatedNews) {
         return res.status(404).json({ message: 'News not found' });
       }
- 
-      // Check if the field has been updated
-    //   console.log('Updated News:', updatedNews);
- 
+  
       res.status(200).json(updatedNews);
     } catch (error) {
       console.error('Error updating news:', error);
       res.status(500).json({ message: 'Failed to update news' });
     }
- });
- 
+  });
+   
 export default router;
