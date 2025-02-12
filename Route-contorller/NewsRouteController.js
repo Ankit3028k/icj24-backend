@@ -3,7 +3,7 @@ import express from 'express';
 import Category from '../Models/Categories.js';
 import mongoose from 'mongoose';
 import multer from 'multer';
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import streamifier from 'streamifier';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -22,20 +22,36 @@ const uploadOptions = multer({ storage: storage });
 
 // Routes
 
-// GET all news, with optional category filter
+// GET all news, with optional category filter and search query
 router.get(`/`, async (req, res) => {
     let filter = {};
+
+    // Check if category filter is passed in the query
     if (req.query.categories) {
         filter = { category: req.query.categories.split(',') };
     }
 
-    const newsList = await News.find(filter).populate('category');
-
-    if (!newsList) {
-        res.status(500).json({ success: false });
+    // Check if search query is passed in the query
+    if (req.query.search) {
+        // Search in title and content
+        const searchQuery = req.query.search;
+        filter = {
+            ...filter,  // Retain previous filters like category
+            $or: [ // Using $or to search in both title and content
+                { title: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive search in title
+                { content: { $regex: searchQuery, $options: 'i' } } // Case-insensitive search in content
+            ]
+        };
     }
-    res.send(newsList);
+
+    try {
+        const newsList = await News.find(filter).populate('category');
+        res.send(newsList);
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
 });
+
 
 // GET a single news by ID
 router.get(`/:id`, async (req, res) => {
@@ -202,31 +218,50 @@ router.put('/gallery-images/:id', uploadOptions.array('images', 10), async (req,
     res.send(news);
 });
 
+// PATCH route to update news
 router.patch('/:id', async (req, res) => {
     const newsId = req.params.id;
     const { isFeatured, isDrafted } = req.body;
-  
-    // Ensure both fields are boolean values
+
+    // Validate the input fields
     if (typeof isFeatured !== 'boolean' || typeof isDrafted !== 'boolean') {
-      return res.status(400).json({ message: 'Both isFeatured and isDrafted must be boolean values.' });
+        return res.status(400).json({
+            message: 'Both "isFeatured" and "isDrafted" must be boolean values.',
+        });
     }
-  
+
+    // Validate if the newsId is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(newsId)) {
+        return res.status(400).json({
+            message: 'Invalid news ID format.',
+        });
+    }
+
     try {
-      const updatedNews = await News.findByIdAndUpdate(
-        newsId,
-        { isFeatured: isFeatured, isDrafted: isDrafted }, // Include isDrafted here as well
-        { new: true }
-      );
-  
-      if (!updatedNews) {
-        return res.status(404).json({ message: 'News not found' });
-      }
-  
-      res.status(200).json(updatedNews);
+        // Find the news by ID and update it
+        const updatedNews = await News.findByIdAndUpdate(
+            newsId,
+            { isFeatured, isDrafted }, // Update both fields
+            { new: true } // Return the updated document
+        );
+
+        // Handle case where news does not exist
+        if (!updatedNews) {
+            return res.status(404).json({
+                message: 'News not found with the provided ID.',
+            });
+        }
+
+        // Return the updated news object
+        res.status(200).json(updatedNews);
     } catch (error) {
-      console.error('Error updating news:', error);
-      res.status(500).json({ message: 'Failed to update news' });
+        // Improved error handling with the error message
+        console.error('Error updating news:', error.message);
+        res.status(500).json({
+            message: 'Failed to update news. Please try again later.',
+            error: error.message, // Optional: Include detailed error message for debugging
+        });
     }
-  });
-   
+});
+
 export default router;
