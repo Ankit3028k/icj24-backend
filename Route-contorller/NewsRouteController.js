@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 const router = express.Router();
 
-
 // Cloudinary configuration
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -23,7 +22,7 @@ const uploadOptions = multer({ storage: storage });
 
 // Routes
 
-// GET all newss, with optional category filter
+// GET all news, with optional category filter
 router.get(`/`, async (req, res) => {
     let filter = {};
     if (req.query.categories) {
@@ -48,7 +47,6 @@ router.get(`/:id`, async (req, res) => {
     res.send(news);
 });
 
-// POST a new news with a single image upload
 // POST a new news with a single image upload
 router.post('/', uploadOptions.single('image'), async (req, res) => {
     const category = await Category.findById(req.body.category);
@@ -79,12 +77,15 @@ router.post('/', uploadOptions.single('image'), async (req, res) => {
         category: req.body.category,
         image: imageUrl,  // Set the image URL from Cloudinary
         author: req.body.author,
+        isDrafted: req.body.isDrafted || false,  // Set isDrafted, defaulting to false if not provided
+        isFeatured: req.body.isFeatured || false,  // Set isFeatured, defaulting to false if not provided
     });
 
     news = await news.save();
     if (!news) return res.status(500).send('The news cannot be created');
     res.send(news);
 });
+
 // PUT to update a news with a new image upload if provided
 router.put('/:id', uploadOptions.single('image'), async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -119,6 +120,8 @@ router.put('/:id', uploadOptions.single('image'), async (req, res) => {
             image: imageUrl,  // Update the image URL from Cloudinary if provided
             author: req.body.author,
             category: req.body.category,
+            isDrafted: req.body.isDrafted || false,  // Update isDrafted
+            isFeatured: req.body.isFeatured || false,  // Update isFeatured
         },
         { new: true }
     );
@@ -138,7 +141,7 @@ router.delete('/:id', async (req, res) => {
             return res.status(404).json({ success: false, message: "news not found!" });
         }
     }).catch(err => {
-        return res.status(500).json({ success: false, error: err }); 
+        return res.status(500).json({ success: false, error: err });
     });
 });
 
@@ -152,7 +155,7 @@ router.get(`/get/count`, async (req, res) => {
     res.send({ newsCount });
 });
 
-// GET featured newss with optional limit
+// GET featured news with optional limit
 router.get(`/get/featured/:count`, async (req, res) => {
     const count = req.params.count ? req.params.count : 0;
     const newses = await News.find({ isFeatured: true }).limit(+count);
@@ -163,7 +166,7 @@ router.get(`/get/featured/:count`, async (req, res) => {
     res.send(newses);
 });
 
-// PUT to upload multiple gallery images for a newse
+// PUT to upload multiple gallery images for a news article
 router.put('/gallery-images/:id', uploadOptions.array('images', 10), async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) {
         return res.status(400).send('Invalid news Id');
@@ -199,4 +202,35 @@ router.put('/gallery-images/:id', uploadOptions.array('images', 10), async (req,
     res.send(news);
 });
 
+// PATCH to update a news (e.g., mark as Featured)
+router.patch('/:id', async (req, res) => {
+    const newsId = req.params.id;
+    const { isFeatured } = req.body;
+    
+ 
+    if (typeof isFeatured !== 'boolean') {
+      return res.status(400).json({ message: 'isFeatured must be a boolean value.' });
+    }
+ 
+    try {
+      const updatedNews = await News.findByIdAndUpdate(
+        newsId,
+        { isFeatured: isFeatured },
+        { new: true }
+      );
+ 
+      if (!updatedNews) {
+        return res.status(404).json({ message: 'News not found' });
+      }
+ 
+      // Check if the field has been updated
+    //   console.log('Updated News:', updatedNews);
+ 
+      res.status(200).json(updatedNews);
+    } catch (error) {
+      console.error('Error updating news:', error);
+      res.status(500).json({ message: 'Failed to update news' });
+    }
+ });
+ 
 export default router;

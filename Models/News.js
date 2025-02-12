@@ -1,7 +1,5 @@
 import mongoose from 'mongoose';
 
-
-
 const newsSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -22,22 +20,27 @@ const newsSchema = new mongoose.Schema({
     // images: [{
     //     type: String
     // }],
-   author:[{
-         type: String,
-         default: ''
-   }],
-   
-   
+    author: [{
+        type: String,
+        default: ''
+    }],
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
-        required: true 
+        required: true
     },
-    
-  
     datePosted: {
         type: Date,
         default: Date.now,
+    },
+    // New fields added
+    isDrafted: {
+        type: Boolean,
+        default: false // Default value is false (not drafted)
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false // Default value is false (not featured)
     },
 });
 
