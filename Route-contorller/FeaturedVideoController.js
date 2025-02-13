@@ -32,3 +32,24 @@ export const getNewsVideos = async (req, res) => {
         res.status(500).json({ message: 'Server error while fetching news videos' });
     }
 };
+// 3. DELETE a news video by ID
+export const deleteNewsVideo = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ message: 'Video ID is required' });
+    }
+
+    try {
+        const deletedVideo = await VideoNews.findByIdAndDelete(id);
+
+        if (!deletedVideo) {
+            return res.status(404).json({ message: 'Video not found' });
+        }
+
+        res.status(200).json({ message: 'News video deleted successfully', video: deletedVideo });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error while deleting news video' });
+    }
+};
